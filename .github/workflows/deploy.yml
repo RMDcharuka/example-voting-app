@@ -30,21 +30,21 @@ jobs:
       # 4️⃣ Build, tag, and push vote image
       - name: Build and push vote image
         run: |
-          IMAGE_URI=${{ secrets.ECR_REPOSITORY_VOTE }}:latest
+          IMAGE_URI=${{ secrets.ECR_REPOSITORY_VOTE }}
           docker build -t $IMAGE_URI ./vote
           docker push $IMAGE_URI
 
       # 5️⃣ Build, tag, and push worker image
       - name: Build and push worker image
         run: |
-          IMAGE_URI=${{ secrets.ECR_REPOSITORY_WORKER }}:latest
+          IMAGE_URI=${{ secrets.ECR_REPOSITORY_WORKER }}
           docker build -t $IMAGE_URI ./worker
           docker push $IMAGE_URI
 
       # 6️⃣ Build, tag, and push result image
       - name: Build and push result image
         run: |
-          IMAGE_URI=${{ secrets.ECR_REPOSITORY_RESULT }}:latest
+          IMAGE_URI=${{ secrets.ECR_REPOSITORY_RESULT }}
           docker build -t $IMAGE_URI ./result
           docker push $IMAGE_URI
 
