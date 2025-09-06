@@ -23,9 +23,6 @@
     # Copy all source code and tests into the container
     COPY . .
     
-    # Install development/test dependencies
-    RUN pip install watchdog pytest
-    
     # Set Flask environment for development
     ENV FLASK_ENV=development
     
