@@ -3,14 +3,14 @@ name: Deploy to ECS
 on:
   push:
     branches:
-      - main  # Change if your default branch is different
+      - main  # change if your default branch is different
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -24,31 +24,68 @@ jobs:
 
       # 3️⃣ Log in to Amazon ECR
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # 4️⃣ Build, tag, and push vote image
+      # ---------------------------
+      # 4️⃣ Build & push images
+      # ---------------------------
+
+      # Redis (if using custom Dockerfile; skip if using official image)
+      - name: Build and push Redis image
+        run: |
+          IMAGE_URI=${{ secrets.ECR_REPOSITORY_REDIS }}
+          docker build -t $IMAGE_URI ./redis
+          docker push $IMAGE_URI
+
+      # PostgreSQL (if using custom Dockerfile; skip if using official image)
+      - name: Build and push PostgreSQL image
+        run: |
+          IMAGE_URI=${{ secrets.ECR_REPOSITORY_POSTGRES }}
+          docker build -t $IMAGE_URI ./postgres
+          docker push $IMAGE_URI
+
+      # Vote service
       - name: Build and push vote image
         run: |
           IMAGE_URI=${{ secrets.ECR_REPOSITORY_VOTE }}
           docker build -t $IMAGE_URI ./vote
           docker push $IMAGE_URI
 
-      # 5️⃣ Build, tag, and push worker image
+      # Worker service
       - name: Build and push worker image
         run: |
           IMAGE_URI=${{ secrets.ECR_REPOSITORY_WORKER }}
           docker build -t $IMAGE_URI ./worker
           docker push $IMAGE_URI
 
-      # 6️⃣ Build, tag, and push result image
+      # Result service
       - name: Build and push result image
         run: |
           IMAGE_URI=${{ secrets.ECR_REPOSITORY_RESULT }}
           docker build -t $IMAGE_URI ./result
           docker push $IMAGE_URI
 
-      # 7️⃣ Deploy vote service
+      # ---------------------------
+      # 5️⃣ Deploy services in order
+      # ---------------------------
+
+      # Redis
+      - name: Deploy Redis service
+        run: |
+          aws ecs update-service \
+            --cluster vote-app-cluster \
+            --service redis-service \
+            --force-new-deployment
+
+      # PostgreSQL
+      - name: Deploy PostgreSQL service
+        run: |
+          aws ecs update-service \
+            --cluster vote-app-cluster \
+            --service postgres-service \
+            --force-new-deployment
+
+      # Vote service
       - name: Deploy vote service
         run: |
           aws ecs update-service \
@@ -56,7 +93,7 @@ jobs:
             --service vote-service \
             --force-new-deployment
 
-      # 8️⃣ Deploy worker service
+      # Worker service
       - name: Deploy worker service
         run: |
           aws ecs update-service \
@@ -64,7 +101,7 @@ jobs:
             --service worker-service \
             --force-new-deployment
 
-      # 9️⃣ Deploy result service
+      # Result service
       - name: Deploy result service
         run: |
           aws ecs update-service \
