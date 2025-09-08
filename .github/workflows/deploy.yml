@@ -56,7 +56,7 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster vote-app-cluster \
-            --service redis-service \
+            --service redis \
             --force-new-deployment
 
       # Deploy Postgres
@@ -64,7 +64,7 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster vote-app-cluster \
-            --service postgres-service \
+            --service postgres \
             --force-new-deployment
 
       # Deploy Vote
@@ -72,7 +72,7 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster vote-app-cluster \
-            --service vote-service \
+            --service vote \
             --force-new-deployment
 
       # Deploy Worker
@@ -80,7 +80,7 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster vote-app-cluster \
-            --service worker-service \
+            --service worker \
             --force-new-deployment
 
       # Deploy Result
@@ -88,5 +88,5 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster vote-app-cluster \
-            --service result-service \
+            --service result \
             --force-new-deployment
