@@ -18,7 +18,7 @@ io.on('connection', function (socket) {
 });
 
 var pool = new Pool({
-  connectionString: 'postgres://postgres:postgres@example-voting-app-db-1/postgres'
+  connectionString: 'postgres://postgres:postgres@postgres-5432-tcp.vote-app.local:5432/postgres'
 });
 
 async.retry(
